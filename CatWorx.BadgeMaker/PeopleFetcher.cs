@@ -37,9 +37,15 @@ namespace CatWorx.BadgeMaker
             {
                 string response = client.DownloadString("https://randomuser.me/api/?results=10&nat=us&inc=name,id,picture");
                 JObject json = JObject.Parse(response);
-                Console.WriteLine(json.SelectToken("results[0].name.first"));
-                Console.WriteLine(json.SelectToken("results[1].name.first"));
-                Console.WriteLine(json.SelectToken("results[2].name.first"));
+                foreach (JToken token in json.SelectToken("results"))
+                {
+                    string firstName = token.SelectToken("name.first").ToString();
+                    string lastName = token.SelectToken("name.last").ToString();
+                    string photoUrl = token.SelectToken("picture.large").ToString();
+                    int id = Int32.Parse(token.SelectToken("id.value").ToString().Replace("-", ""));
+                    Employee currentEmployee = new Employee(firstName, lastName, id, photoUrl);
+                    employees.Add(currentEmployee);
+                }
             }
                 return employees;
         }
